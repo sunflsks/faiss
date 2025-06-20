@@ -138,9 +138,10 @@ class DatasetAssignDispatch:
             enumerate(self.xes)
         )
 
+        # TODO - completely rewrite and figure out what is going on here
+
         D_allshards = []
         I_allshards = []
-
         for i, (Di, Ii) in enumerate(src):
             D_allshards.append(Di)
             I_allshards.append(Ii + self.cs[i]) # cs[i] tells us where indices for this shard start
