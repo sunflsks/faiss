@@ -123,10 +123,19 @@ class DatasetAssignDispatch:
 
     def search(self, xq, k):
         """k-ann search"""
-        # dispatch to all the DatasetAssigns
+        # dispatch to all the DatasetAssigns. we automatically split up the queries as well
+
+        queries_per_shard = len(xq) // len(self.xes)
+
+        def search_auto_split(xes_idx_dataset):
+            xes_idx, dataset = xes_idx_dataset
+            # we must split up the queries into one for each shard.
+            xq_shard = xq[queries_per_shard * xes_idx : queries_per_shard * (xes_idx + 1)]
+            return dataset.search(xq_shard, k)
+
         src = self.imap(
-            lambda x: x.search(xq, k),
-            self.xes
+            search_auto_split,
+            enumerate(self.xes)
         )
 
         D_allshards = []
